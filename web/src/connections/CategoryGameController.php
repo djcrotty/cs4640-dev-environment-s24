@@ -2,8 +2,6 @@
 
 class CategoryGameController {
 
-    private $questions = [];
-
     // An error message to display on the welcome page
     private $errorMessage = "";
 
@@ -15,8 +13,6 @@ class CategoryGameController {
         
         // Set input
         $this->input = $input;
-
-        $this->loadQuestions();
     }
 
     /**
@@ -32,7 +28,6 @@ class CategoryGameController {
         if (isset($this->input["command"]))
             $command = $this->input["command"];
 
-        // NOTE: UPDATED 3/29/2024!!!!!
         // If the session doesn't have the key "name", AND they
         // are not trying to login (UPDATE!), then they
         // got here without going through the welcome page, so we
@@ -50,6 +45,12 @@ class CategoryGameController {
             case "login":
                 $this->login();
                 break;
+            case "gameOver":
+                $this->gameOver();
+                break;
+            case "resetGame":
+                $this->resetGame();
+                break;
             case "logout":
                 $this->logout();
                 // no break; logout will also show the welcome page.
@@ -64,12 +65,37 @@ class CategoryGameController {
      * in the current object.
      */
     public function loadQuestions() {
-        $this->questions = json_decode(
-            file_get_contents("/opt/src/connections.json"), true);
-
-        if (empty($this->questions)) {
+        $categories = json_decode(
+            file_get_contents("/var/www/html/homework/connections.json"), true);
+        if (empty($categories)) {
             die("Something went wrong loading questions");
         }
+        //choose 4 random categories and place in SESSION object categories variable
+        $rand_index = [];
+        while(count($rand_index) < 4) {
+            $rand_index[] = random_int(0, count($categories) - 1);
+            $rand_index = array_unique($rand_index);
+        }
+        $chosen_categories = [];
+        $keys = array_keys($categories);
+        foreach ($rand_index as $index) {
+            $chosen_categories[$keys[$index]] = $categories[$keys[$index]];
+            //remove 2 words so its only 4 words per category
+            $remove_keys = array_rand($chosen_categories[$keys[$index]], 2);
+            unset($chosen_categories[$keys[$index]][$remove_keys[0]], $chosen_categories[$keys[$index]][$remove_keys[1]]);
+        }
+        $_SESSION["categories"] = $chosen_categories;
+
+        //get each word and a number associated with it from the SESSION categories variable
+        $words = [];
+        foreach ($_SESSION["categories"] as $category) {
+            foreach ($category as $word) {
+                $words[] = $word;
+            }
+        }
+        shuffle($words);
+        array_unshift($words, "0 placeholder");
+        $_SESSION["words"] = $words;
     }
 
     /**
@@ -91,6 +117,12 @@ class CategoryGameController {
             $_SESSION["name"] = $_POST["fullname"];
             $_SESSION["email"] = $_POST["email"];
             $_SESSION["score"] = 0;
+            $_SESSION["guesses_log"] = [];
+            $_SESSION["num_guesses"] = 0;
+            $_SESSION["words"] = [];
+            $_SESSION["correct_categories"] = [];
+            $_SESSION['correct_words'] = [];
+            $this->loadQuestions();
             header("Location: ?command=question");
             return;
         }
@@ -108,41 +140,6 @@ class CategoryGameController {
         session_destroy();
         session_start();
     }
-    
-    /**
-     * Our getQuestion function, now as a method!
-     */
-    public function getQuestion($id=null) {
-
-        // If $id is not set, then get a random question
-        // We wrote this in class.
-        if ($id === null) {
-            // Read ONE random question from the database
-            $qn = $this->db->query("select * from questions order by random() limit 1;");
-
-            // The query function calls pg_fetch_all, which returns an **array of arrays**.
-            // That means that if we only have one row in our result, it's an array at
-            // position 0 of the array of arrays.
-            // Note: we should check that $qn here is _not_ false first!
-            return $qn[0];
-        }
-        
-        // If an $id **was** passed in, then we should get that specific
-        // question from the database.
-        //
-        // NOTE: We did **not** write this in class, but it is provided/updated
-        // below:
-        if (is_numeric($id)) {
-            $res = $this->db->query("select * from questions where id = $1;", $id);
-            if (empty($res)) {
-                return false;
-            }
-            return $res[0];
-        }
-       
-        // Anything else, just return false
-        return false;
-    }
 
     /**
      * Show a question to the user.  This function loads a
@@ -153,8 +150,13 @@ class CategoryGameController {
         $name = $_SESSION["name"];
         $email = $_SESSION["email"];
         $score = $_SESSION["score"];
-        $question = $this->getQuestion();
-        include("/opt/src/trivia/templates/question.php");
+        $guesses_log = $_SESSION["guesses_log"];
+        $words = $_SESSION["words"];
+        $num_guesses = $_SESSION["num_guesses"];
+        $correct_words = $_SESSION["correct_words"];
+        // var_dump($_SESSION["categories"]);
+        // var_dump($words);
+        include("/opt/src/connections/templates/game.php");
     }
 
     /**
@@ -175,29 +177,98 @@ class CategoryGameController {
      */
     public function answerQuestion() {
         $message = "";
-        if (isset($_POST["questionid"]) && is_numeric($_POST["questionid"])) {
+        if(count($_SESSION["correct_categories"]) >= 4) {
+            header("Location: ?command=gameOver");
+        }
 
-            $question = $this->getQuestion($_POST["questionid"]);
-
-            if (strtolower(trim($_POST["answer"])) == strtolower($question["answer"])) {
+        if (isset($_POST["answer"])) {
+            $answer_words = explode(" ", $_POST["answer"]);
+            var_dump($answer_words);
+            
+            $words = $_SESSION["words"];
+            var_dump($words[intval($answer_words[0])]);
+            $max_num_correct_words = 0;
+            $max_num_correct_category = "";
+            foreach ($_SESSION["categories"] as $key => $category) {
+                var_dump($category);
+                $num_correct_words = 0;
+                foreach ($answer_words as $answer_word) {
+                    if (intval($answer_word) < count($words) && in_array($words[intval($answer_word)], $category)) {
+                        $num_correct_words += 1;
+                        if ($num_correct_words > $max_num_correct_words) {
+                            $max_num_correct_words = $num_correct_words;
+                            $max_num_correct_category = $key;
+                        }
+                    }
+                }
+            }
+            $_SESSION["num_guesses"] += 1;
+            if ($max_num_correct_words == 0) {
+                $message = "<div class=\"alert alert-danger\" role=\"alert\">
+                0 words correct!
+                </div>";
+                $_SESSION["guesses_log"][] = "0 words correct!";
+            }
+            elseif ($max_num_correct_words == 4) {
                 $message = "<div class=\"alert alert-success\" role=\"alert\">
-                    Correct!
-                    </div>";
-                // Update the score in the session
-                $_SESSION["score"] += 10;
-
-                // **NEW**: We'll update the user's score in the database, too!
-                $this->db->query("update users set score = $1 where email = $2;", 
-                                    $_SESSION["score"], $_SESSION["email"]);
+                ".$max_num_correct_words." words correct! The category was ".$max_num_correct_category."
+                </div>";
+                $_SESSION["guesses_log"][] = $max_num_correct_words." words correct! The category was ".$max_num_correct_category;
+                $_SESSION["correct_categories"][] = $max_num_correct_category;
+                $_SESSION["correct_categories"] = array_unique($_SESSION["correct_categories"]);
+                foreach ($answer_words as $word) {
+                    $_SESSION["correct_words"][] = intval($word);
+                }
+                if(count($_SESSION["correct_categories"]) >= 4) {
+                    $_SESSION["score"] += 1;
+                    header("Location: ?command=gameOver");
+                }
             }
             else {
-                $message = "<div class=\"alert alert-danger\" role=\"alert\">
-                    Incorrect! The correct answer was: {$question["answer"]}
-                    </div>";
+
+                $message = "<div class=\"alert alert-warning\" role=\"alert\">
+                ".$max_num_correct_words." words correct!
+                </div>";
+                $_SESSION["guesses_log"][] = $max_num_correct_words." words correct!";
             }
+        }
+        else {
+            $message = "<div class=\"alert alert-danger\" role=\"alert\">
+                Please Enter an Answer!
+                </div>";
         }
 
         $this->showQuestion($message);
+    }
+
+
+    public function gameOver() { 
+        $message = "";
+        if (count($_SESSION["correct_categories"]) >= 4) {
+            $message = "<div class=\"alert alert-success\" role=\"alert\">
+            You won! You got it correct in ".$_SESSION["num_guesses"]." guesses
+            </div>";
+        }
+        else {
+            $message = "<div class=\"alert alert-danger\" role=\"alert\">
+            You lose! You made ".$_SESSION["num_guesses"]." guesses
+            </div>";
+        }
+        $name = $_SESSION["name"];
+        $email = $_SESSION["email"];
+        $score = $_SESSION["score"];
+        $categories = $_SESSION["categories"];
+        include("/opt/src/connections/templates/gameOver.php");
+    }
+
+    public function resetGame() {
+        $_SESSION["guesses_log"] = [];
+        $_SESSION["num_guesses"] = 0;
+        $_SESSION["words"] = [];
+        $_SESSION["correct_categories"] = [];
+        $_SESSION["correct_words"] = [];
+        $this->loadQuestions();
+        header("Location: ?command=question");
     }
 
 }
