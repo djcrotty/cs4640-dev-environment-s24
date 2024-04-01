@@ -25,6 +25,23 @@
                 </div>
             </div>
             <div class="row">
+                <h2>The Categories are:</h2>
+                    <?php
+                        foreach ($categories as $key => $words) {
+                            echo 
+                            '<div class="card" style="width: 18rem;">
+                                <div class="card-header">
+                                    '.$key.'
+                                </div>
+                                <ul class="list-group list-group-flush">';
+                            foreach ($words as $word) {
+                                echo '<li class="list-group-item">'.$word.'</li>';
+                            }
+                            echo'</ul></div>';
+                        }
+                    ?>
+            </div>
+            <div class="row">
                 <div class="col-xs-12">
                 <form action="?command=resetGame" method="post">
                     <input type="hidden" name="questionid" value="<?=$question["id"]?>">
