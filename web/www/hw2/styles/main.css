@@ -1,0 +1,72 @@
+
+p {
+    font: 1em sans-serif;
+    width: 300px;
+    margin: 10px auto 10px auto;
+    background-color: lightskyblue;
+    padding: 10px;
+    border-radius: 5%;
+}
+
+header {
+    padding: 20px;
+    background-color: lightblue;
+}
+
+.highlight-header {
+    text-align: center;
+}
+
+section {
+    margin: 10px;
+    background-color: lightblue;
+}
+
+section h2, section h3 {
+    text-align: center;
+}
+
+nav {
+    background-color: #91b9db;
+}
+
+.primary-footer {
+    background-color: aliceblue;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.copyright {
+    float: left;
+    background-color: azure;
+}
+
+img {
+    display: block;
+    width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.section-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    flex-basis: 300px;
+    flex-wrap: wrap;
+    align-content: center;
+}
+
+section.outer-section-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    flex-basis: 300px;
+    flex-wrap: wrap;
+    align-content: baseline;
+}
+
+.section-container * {
+    padding: 10px;
+    flex: 1 1 0;
+}

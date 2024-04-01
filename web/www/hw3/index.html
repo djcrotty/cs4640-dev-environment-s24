@@ -1,0 +1,140 @@
+<!-- Bootstrap components used
+1. Buttons
+2. Navbar class and links
+3. container sizes for sections
+4. background colors for sections
+5. accordion for group of three sections
+6. Footer navbar
+-->
+
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1"> 
+
+        <meta name="author" content="Dylan Crotty">
+        <meta name="description" content="A short introduction and description of Dylan Crotty">
+        <meta name="keywords" content="Dylan Crotty Personal Page Introduction Activities About">
+        
+        <meta property="og:title" content="page">
+        <meta property="og:type" content="website">
+        <meta property="og:image" content="">
+        <meta property="og:url" content="https://cs4640.cs.virginia.edu/vpv4ds/hw2/index.html">
+        <meta property="og:description" content="A short introduction and description of Dylan Crotty">
+        <meta property="og:site_name" content="Dylan Crotty's Personal Website">
+
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+        <link rel="stylesheet/less" type="text/css" href="./styles/custom.less">
+
+        <title>Main - Dylan Crotty</title>
+    </head>  
+    <body>
+        <header class="header">
+            <h1>Personal Page for Dylan Crotty</h1>
+            <h2>Bachelors of Science in Computer Science Class of 2025</h2>
+            <nav class="navbar">
+                <div class="container-fluid">
+                    <a href="./index.html" class="navbar-text">Main</a>
+                    <a href="./clubs.html" class="navbar-text">Clubs</a>
+                    <a href="./contacts.html" class="navbar-text">Contacts</a>
+                    <a href="./hobbies.html" class="navbar-text">Hobbies</a>
+                    <a href="./courses.html" class="navbar-text">Courses</a>
+                </div>
+            </nav>
+        </header>
+        <section class="section-container bg-primary-subtle">
+            <div>
+                <h2>An introduction to Dylan Crotty </h2>
+                <p>
+                    My name is Dylan Crotty, I am a student in the College of Engineering studying Computer Science at UVA.
+                    I am in the class of 2024, and this webpage is an introduction to my background. I am currently a third year, and I am 
+                    also in the CourseForum website club, along with the Chinese student Association. My hobbies are playing video games, going to
+                    the gym, and hanging out with friends. Here you can find pages for my clubs, contact information, hobbies, and courses taken.
+                </p>
+            </div>
+            <div>
+                <img src="images/IMG_3803.jpg" alt="Dylan Crotty" class="image">
+            </div>
+        </section>
+        <div class="bg-primary-subtle">
+            <h2 class="highlight-header">Highlights About Me</h2>
+            <div class="outer-section-container accordion">
+                <section class="section-container accordion-item">
+                    <h3 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            Clubs
+                            </button>
+                    </h3>
+                    <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                        <div class="accordion-body">
+                            <p>
+                                The CourseForum website club is a club that maintains and develops the 
+                                CourseForum website. I have been a member for two years and have helped developed the
+                                history page. Other clubs that I have been in are the Student Game Developers club and the Chinese Student Association.
+                            </p>
+                            <p>
+                                More can be found at <a href="./clubs.html" class="btn btn-info">Clubs</a>
+                                <a href="https://thecourseforum.com/" class="btn btn-secondary">CourseForum</a>
+                            </p>
+                            <img src="images/courseforum_logo.svg" alt="courseforum website logo"  class="image">
+                        </div>
+                    </div>
+                </section>
+                <section class="section-container accordion-item">
+                    <h3>
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                            Courses
+                        </button>
+                    </h3>
+                    <div id="collapseTwo" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                        <div class="accordion-body">
+                            <p>
+                                Some courses that I have taken at UVA are Data Structures and Algorithms 1 and 2, Computer Systems and Organization 1 and 2,
+                                Software Development Essentials, Advanced Software Development, Introduction to Cybersecurity, Discrete Mathematics 1 and 2,
+                                and Machine Learning. I have also been a teaching assistant for the Computer Systems and Organization course, both 1 and 2. Additionally,
+                                this semester I am taking Programming Languages for Web development, Artificial Intelligence, and Natural Language Processing.
+                            </p>
+                            <p>
+                                More can be found at <a href="./courses.html" class="btn btn-info">Courses</a>
+                            </p>
+                            <img src="images/uva_campus.jpeg" alt="UVA campus grounds" class="image">
+                        </div>
+                    </div>
+                </section>
+                <section class="section-container accordion-item">
+                    <h3>
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                            Hobbies
+                          </button>
+                    </h3>
+                    <div id="collapseThree" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                        <div class="accordion-body">
+                            <p>
+                                Activities that I like to indulge in are playing video games, going to the gym, and hanging out with friends. Some video games that I have played
+                                are Minecraft, Destiny, Halo, Deep Rock Galactic, and recently Lethal Company. 
+                            </p>
+                            <p>
+                                More can be found at <a href="./hobbies.html" class="btn btn-info">Hobbies</a>
+                            </p>
+                            <img src="images/deeprockgalactic.jpeg" alt="deep rock galactic game" class="image">
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+        <footer class="primary-footer container-sm">
+            <nav class="navbar row align-items-start">
+                <a href="./index.html" class="navbar-text col">Main</a>
+                <a href="./clubs.html" class="navbar-text col">Clubs</a>
+                <a href="./contacts.html" class="navbar-text col">Contacts</a>
+                <a href="./hobbies.html" class="navbar-text col">Hobbies</a>
+                <a href="./courses.html" class="navbar-text col">Courses</a>
+            </nav>
+            <small class="copyright">Crotty 2024 ©</small>
+        </footer>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/less" ></script>
+    </body>
+</html>
