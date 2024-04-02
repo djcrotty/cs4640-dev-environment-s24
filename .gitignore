@@ -1,3 +1,5 @@
 db
 compose-dev.yaml
 docker-compose.yml
+web/www/cs4640-FitPro
+web/src/cs4640-FitPro
