@@ -66,7 +66,7 @@ class CategoryGameController {
      */
     public function loadQuestions() {
         $categories = json_decode(
-            file_get_contents("/var/www/html/homework/connections.json"), true);
+            file_get_contents("/opt/src/connections.json"), true);
         if (empty($categories)) {
             die("Something went wrong loading questions");
         }
