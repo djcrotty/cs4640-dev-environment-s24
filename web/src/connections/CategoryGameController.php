@@ -154,9 +154,7 @@ class CategoryGameController {
         $words = $_SESSION["words"];
         $num_guesses = $_SESSION["num_guesses"];
         $correct_words = $_SESSION["correct_words"];
-        // var_dump($_SESSION["categories"]);
-        // var_dump($words);
-        include("/opt/src/connections/templates/game.php");
+        include("/students/vpv4ds/students/vpv4ds/opt/src/connections/templates/game.php");
     }
 
     /**
@@ -169,7 +167,7 @@ class CategoryGameController {
         if (!empty($this->errorMessage)) {
             $message = "<div class='alert alert-danger'>{$this->errorMessage}</div>";
         }
-        include("/opt/src/connections/templates/welcome.php");
+        include("/students/vpv4ds/students/vpv4ds/opt/src/connections/templates/welcome.php");
     }
 
     /**
@@ -183,14 +181,10 @@ class CategoryGameController {
 
         if (isset($_POST["answer"])) {
             $answer_words = explode(" ", $_POST["answer"]);
-            var_dump($answer_words);
-            
             $words = $_SESSION["words"];
-            var_dump($words[intval($answer_words[0])]);
             $max_num_correct_words = 0;
             $max_num_correct_category = "";
             foreach ($_SESSION["categories"] as $key => $category) {
-                var_dump($category);
                 $num_correct_words = 0;
                 foreach ($answer_words as $answer_word) {
                     if (intval($answer_word) < count($words) && in_array($words[intval($answer_word)], $category)) {
@@ -258,7 +252,7 @@ class CategoryGameController {
         $email = $_SESSION["email"];
         $score = $_SESSION["score"];
         $categories = $_SESSION["categories"];
-        include("/opt/src/connections/templates/gameOver.php");
+        include("/students/vpv4ds/students/vpv4ds/opt/src/connections/templates/gameOver.php");
     }
 
     public function resetGame() {
