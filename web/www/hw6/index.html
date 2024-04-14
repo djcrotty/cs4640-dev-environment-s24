@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+  <meta charset="UTF-8">  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="CS4640 Spring 2024">
+  <meta name="description" content="Our Front-Controller Trivia Game">  
+  <title>Connections - Trivia</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"  integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"  crossorigin="anonymous">       
+</head>
+
+<body>
+    
+<div class="container" style="margin-top: 15px;">
+    <div class="row">
+        <div class="col-xs-12">
+            <h1>Connections Game</h1>
+            <!-- Show the user's information and score -->
+            <h2 id="score">Score: 0</h2>
+            <h3 id="streak">Streak: 0</h3>
+            <h4 id="average_guesses">Average guesses per game: 0</h4>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12"> <!-- message -->
+        </div>
+        <div class="col-xs-12" id="guesses_log"> <!-- guesses log -->
+            <h3 id="guesses">Guesses: 0</h3>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-xs-12">
+        <form id="form">
+            <div class="row" id="correct-row-1"></div>
+            <div class="row" id="correct-row-2"></div>
+            <div class="row" id="correct-row-3"></div>
+            <div class="row" id="correct-row-4"></div>
+            <div class="row" id="first-row">
+                <button type="button" id="button 0" class="col"> </button>
+                <button type="button" id="button 1" class="col"> </button>
+                <button type="button" id="button 2" class="col"> </button>
+                <button type="button" id="button 3" class="col"> </button>
+            </div>
+            <div class="row" id="second-row">
+                <button type="button" id="button 4" class="col"> </button>
+                <button type="button" id="button 5" class="col"> </button>
+                <button type="button" id="button 6" class="col"> </button>
+                <button type="button" id="button 7" class="col"> </button>
+            </div>
+            <div class="row" id="third-row">
+                <button type="button" id="button 8" class="col"> </button>
+                <button type="button" id="button 9" class="col"> </button>
+                <button type="button" id="button 10" class="col"> </button>
+                <button type="button" id="button 11" class="col"> </button>
+            </div>
+            <div class="row" id="fourth-row">
+                <button type="button" id="button 12" class="col"> </button>
+                <button type="button" id="button 13" class="col"> </button>
+                <button type="button" id="button 14" class="col"> </button>
+                <button type="button" id="button 15" class="col"> </button>
+            </div>
+            <button type="button" onclick="submit_guess()" class="btn btn-primary">Submit Answer</button>
+            <button type="button" onclick="shuffle_words()" class="btn btn-success">Shuffle Words</button>
+            <button type="button" onclick="new_game()" class="btn btn-danger">New Game/Restart</button>
+            <button type="button" onclick="clear_history()" class="btn btn-danger">Clear History</button>
+        </form>
+        </div>
+    </div>
+
+</div>
+<script type="text/javascript" src="connections.js"></script>
+<script>
+    var score = 0;
+    var total_guesses = 0;
+    var total_games = 1;
+    var win_streak = 0;
+    var average_guesses_per_game = 0;
+    var guesses = 0;
+    var guesses_log = [];
+    var word_categories = [];
+    var words = []; 
+    var selected_buttons = new Set();
+    var num_correct_categories = 0;
+    var correct_words = [];
+    var words_left = new Set();
+
+    var cleared = 0;
+
+    function setup(newCategories) {
+        console.log(newCategories);
+        word_categories = newCategories;
+        for(i = 0; i < 4; i++) {
+            words.push(...word_categories.categories[i].words);
+        }
+        words_left = new Set(words);
+        console.log(words_left);
+        console.log(words);
+        words.forEach((element, index) => {
+            console.log("button " + index);
+            let button = document.getElementById("button " + index)
+            button.innerHTML = element;
+            //event handlers functionality for button selecting
+            button.onclick = () => {
+                //not already part of correct words
+                if(!button.parentElement.className.includes("correct")){
+                    //deselect button
+                    if(selected_buttons.has(button.id)){
+                        selected_buttons.delete(button.id);
+                        button.setAttribute("class", "col");
+                    }
+                    //select button
+                    else if(selected_buttons.size < 4) {
+                        selected_buttons.add(button.id);
+                        button.setAttribute("class", "col border border-primary");
+                    }
+                }               
+            };
+            
+        });
+        //shuffle_words();
+        guesses_log.forEach((guess) => {
+            let newGuess = document.createElement("h4");
+            newGuess.innerHTML = guess[0];
+            if(guess[1]) {
+                newGuess.setAttribute("class", "card bg-success");
+            } 
+            else {
+                newGuess.setAttribute("class", "card bg-warning");
+            }
+            document.getElementById("guesses_log").appendChild(newGuess)  ;
+        });
+        document.getElementById("guesses").innerHTML = "Guesses: " + guesses;
+        document.getElementById("average_guesses").innerHTML = "Average guesses per game: " + (average_guesses_per_game);
+    };
+    function clear_history() {
+        localStorage.clear();
+        cleared = 1;
+        average_guesses_per_game = 0;
+        total_games = 0;
+        total_guesses = 0;
+        win_streak = 0;
+        new_game();
+    };
+    function new_game() {
+        if(num_correct_categories < 4) {
+            win_streak = 0;
+        }
+        total_games++;
+        guesses = 0;
+        guesses_log = [];
+        word_categories = [];
+        words = []; 
+        selected_buttons = new Set();
+        num_correct_categories = 0;
+        correct_words = [];
+        words_left = new Set();
+
+        let guessesDiv = document.getElementById("guesses");
+        guessesDiv.innerHTML = "Guesses: 0";
+        let guesses_log_div =document.getElementById("guesses_log");
+        guesses_log_div.innerHTML = "";
+        guesses_log_div.appendChild(guessesDiv);
+        for(i = 0; i < 16; i++) {
+            let button = document.getElementById("button " + i);
+            button.setAttribute("class", "col");
+        }
+        getRandomCategories(setup);
+    };
+    function submit_guess() {
+        if(num_correct_categories >= 4) return;
+        total_guesses++;
+        average_guesses_per_game = total_guesses/total_games;
+        document.getElementById("average_guesses").innerHTML = "Average guesses per game: " + (average_guesses_per_game);
+        let guessed_words = [];
+        selected_buttons.forEach((element) => {
+            let button = document.getElementById(element);
+            guessed_words.push(button.innerHTML);
+        });
+        console.log(guessed_words);
+        let max_correct_guesses = 0;
+        let max_correct_guesses_category = word_categories.categories[0].category;
+        word_categories.categories.forEach((element) => {
+            console.log(element.words);
+            //if correct quess move correct words to top and add to log correct guess
+            if(element.words.every((word) => guessed_words.includes(word))) {
+                max_correct_guesses = 4;
+                max_correct_guesses_category = element.category;
+                console.log("correct!");
+                num_correct_categories += 1;
+                let correct_row = document.getElementById("correct-row-" + num_correct_categories);
+                selected_buttons.forEach((element) => {
+                    correct_row.appendChild(document.getElementById(element));
+                });
+                element.words.forEach((element) => {
+                    words_left.delete(element);
+                });
+            }
+            else {
+                let correct_guesses = 0;
+                guessed_words.forEach((word) => {
+                    if(element.words.includes(word)) { correct_guesses += 1; }
+                });
+                if(correct_guesses > max_correct_guesses) {
+                    max_correct_guesses = correct_guesses;
+                    max_correct_guesses_category = element.category;
+                }
+            }
+        });
+        if(max_correct_guesses < 4) {
+            selected_buttons.forEach((element) => {
+                let button = document.getElementById(element);
+                button.setAttribute("class", "col");
+            });
+            append_Guess_log("Incorrect! Number of correct words are: " + max_correct_guesses, false);
+        }
+        else {
+            selected_buttons.forEach((element) => {
+                let button = document.getElementById(element);
+                button.setAttribute("class", "col bg-success");
+            });
+            append_Guess_log("Correct! The category was: " + max_correct_guesses_category, true);
+        }
+        selected_buttons.clear();
+        document.getElementById("guesses").innerHTML = "Guesses: " + (++guesses);
+        console.log("submitted guess");
+
+        //check if game is won
+        if(num_correct_categories >= 4) {
+            score += 1;
+            document.getElementById("score").innerHTML = "Score: " + score;
+            win_streak += 1;
+            document.getElementById("streak").innerHTML = "Streak: " + win_streak;
+        }
+    };
+    function shuffle_words() {
+        let buttons = [];
+        document.getElementById("first-row").childNodes.forEach((node) => {
+            if(node.nodeName == "BUTTON")
+                buttons.push(node);
+        });
+        document.getElementById("second-row").childNodes.forEach((node) => {
+            if(node.nodeName == "BUTTON")
+                buttons.push(node);
+        });
+        document.getElementById("third-row").childNodes.forEach((node) => {
+            if(node.nodeName == "BUTTON")
+                buttons.push(node);
+        });
+        document.getElementById("fourth-row").childNodes.forEach((node) => {
+            if(node.nodeName == "BUTTON")
+                buttons.push(node);
+        });
+        function shuffleArray(array) {
+            for (var i = array.length - 1; i > 0; i--) { 
+                // Generate random number 
+                var j = Math.floor(Math.random() * (i + 1));
+                            
+                var temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
+            };
+        };
+        shuffleArray(buttons);
+        console.log(buttons);
+        buttons.forEach((button, index) => {
+            if(index < 4) {
+                document.getElementById("first-row").appendChild(button);
+            }
+            else if (index < 8){
+                document.getElementById("second-row").appendChild(button);
+            }
+            else if (index < 12){
+                document.getElementById("third-row").appendChild(button);
+            }
+            else {
+                document.getElementById("fourth-row").appendChild(button);
+            }
+        });
+        
+    };
+    function append_Guess_log(message, success) {
+        let guesses_log_div = document.getElementById("guesses_log");
+        let newGuess = document.createElement("h4");
+        newGuess.innerHTML = message;
+        if(success) {
+            newGuess.setAttribute("class", "card bg-success");
+        } 
+        else {
+            newGuess.setAttribute("class", "card bg-warning");
+        }
+        guesses_log_div.appendChild(newGuess);  
+        guesses_log.push([message, success]);
+
+    }
+    
+    window.onload = getRandomCategories(function load_localStorage() {
+        console.log("loading page");
+        if(localStorage.getItem("cleared") != null && localStorage.getItem("cleared") == 0){
+            score = localStorage.getItem("score");
+            win_streak = localStorage.getItem("streak");
+            word_categories = JSON.parse(localStorage.getItem("game"));
+            guesses = localStorage.getItem("guesses");
+            average_guesses_per_game = localStorage.getItem("average_guesses");
+            guesses_log = JSON.parse(localStorage.getItem("guesses_log"));
+            total_games = localStorage.getItem("total_games");
+            total_guesses = localStorage.getItem("total_guesses");
+            setup(word_categories);
+        }
+        else {
+            getRandomCategories(setup);
+        }
+    });
+    window.addEventListener("unload", function store_localStorage() {
+        console.log("unloading page");
+        //save current game
+        localStorage.setItem("score", score);
+        localStorage.setItem("streak", win_streak);
+        localStorage.setItem("game", JSON.stringify(word_categories));
+        localStorage.setItem("guesses", guesses);
+        localStorage.setItem("average_guesses", average_guesses_per_game);
+        localStorage.setItem("guesses_log", JSON.stringify(guesses_log));
+        localStorage.setItem("total_games", total_games);
+        localStorage.setItem("total_guesses", total_guesses);
+        localStorage.setItem("cleared", cleared);
+    });
+    
+</script>    
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+</body>
+</html>
