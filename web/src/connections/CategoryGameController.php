@@ -198,7 +198,7 @@ class CategoryGameController {
             }
             $_SESSION["num_guesses"] += 1;
             if ($max_num_correct_words == 0) {
-                $message = "<div class=\"alert alert-danger\" role=\"alert\">
+                $message = "<div class=\"alert alert-danger w-25\" role=\"alert\">
                 0 words correct!
                 </div>";
                 $_SESSION["guesses_log"][] = "0 words correct!";
