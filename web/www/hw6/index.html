@@ -88,16 +88,16 @@
     var cleared = 0;
 
     function setup(newCategories) {
-        console.log(newCategories);
+        //console.log(newCategories);
         word_categories = newCategories;
         for(i = 0; i < 4; i++) {
             words.push(...word_categories.categories[i].words);
         }
         words_left = new Set(words);
-        console.log(words_left);
-        console.log(words);
+        //console.log(words_left);
+        //console.log(words);
         words.forEach((element, index) => {
-            console.log("button " + index);
+            //console.log("button " + index);
             let button = document.getElementById("button " + index)
             button.innerHTML = element;
             //event handlers functionality for button selecting
@@ -118,7 +118,7 @@
             };
             
         });
-        //shuffle_words();
+        shuffle_words();
         guesses_log.forEach((guess) => {
             let newGuess = document.createElement("h4");
             newGuess.innerHTML = guess[0];
@@ -177,16 +177,16 @@
             let button = document.getElementById(element);
             guessed_words.push(button.innerHTML);
         });
-        console.log(guessed_words);
+        //console.log(guessed_words);
         let max_correct_guesses = 0;
         let max_correct_guesses_category = word_categories.categories[0].category;
         word_categories.categories.forEach((element) => {
-            console.log(element.words);
+            //console.log(element.words);
             //if correct quess move correct words to top and add to log correct guess
             if(element.words.every((word) => guessed_words.includes(word))) {
                 max_correct_guesses = 4;
                 max_correct_guesses_category = element.category;
-                console.log("correct!");
+                //console.log("correct!");
                 num_correct_categories += 1;
                 let correct_row = document.getElementById("correct-row-" + num_correct_categories);
                 selected_buttons.forEach((element) => {
@@ -223,7 +223,7 @@
         }
         selected_buttons.clear();
         document.getElementById("guesses").innerHTML = "Guesses: " + (++guesses);
-        console.log("submitted guess");
+        //console.log("submitted guess");
 
         //check if game is won
         if(num_correct_categories >= 4) {
@@ -262,7 +262,7 @@
             };
         };
         shuffleArray(buttons);
-        console.log(buttons);
+        //console.log(buttons);
         buttons.forEach((button, index) => {
             if(index < 4) {
                 document.getElementById("first-row").appendChild(button);
@@ -295,7 +295,7 @@
     }
     
     window.onload = getRandomCategories(function load_localStorage() {
-        console.log("loading page");
+        //console.log("loading page");
         if(localStorage.getItem("cleared") != null && localStorage.getItem("cleared") == 0){
             score = localStorage.getItem("score");
             win_streak = localStorage.getItem("streak");
@@ -312,7 +312,7 @@
         }
     });
     window.addEventListener("unload", function store_localStorage() {
-        console.log("unloading page");
+        //console.log("unloading page");
         //save current game
         localStorage.setItem("score", score);
         localStorage.setItem("streak", win_streak);

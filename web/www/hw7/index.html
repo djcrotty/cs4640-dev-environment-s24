@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"  integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"  crossorigin="anonymous">       
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.js" integrity="sha512-+k1pnlgt4F1H8L7t3z95o3/KO+o78INEcXTbnoJQ/F2VqDVhWoaiVml/OEHv9HsVgxUaVW+IbiZPUJQfF/YxZw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        var numRows = 0;
+        var numColumns = 0;
+        function startGame(event) {
+            event.preventDefault();
+            let onPositions = [];
+            console.log("starting game");
+            numRows = $("#rows").val();
+            numColumns = $("#columns").val();
+            //JQuery get call
+            let setUpURL = "./setup.php?rows=" + numRows + "&columns=" + numColumns; 
+            let result = $.get(setUpURL, function(data) {
+                console.log(data);
+                data.forEach(element => {
+                    onPositions.push(element);
+                });
+            }).done(function() {
+                console.log(onPositions);
+                createGame(numRows, numColumns, onPositions);
+            });
+        };
+        function createGame(rows, columns, onPositions) {
+            console.log("creating game");
+            let $gameDiv = $("#game-div");
+            //clear any children 
+            $gameDiv.children().remove();
+            $("#win-message").children().remove();
+            //create rows
+            for(row = 0; row < rows; row++) {
+                let $rowDiv = $("<div id=\"row-" + row + "\"></div>");
+                $rowDiv.attr("class", "d-flex flex-row");
+                $gameDiv.append($rowDiv);
+                //create columns for each row
+                for(column = 0; column < columns; column++) {
+                    let $box = $("<div style=\"height:100px; width:100px\"></div>");
+                    $rowDiv.append($box);
+                    $box.attr("id", "row-" + row + "-column-" + column);
+                    if(onPositions.some(pos => pos.x == column && pos.y == row)) {
+                        $box.attr("class", "border");
+                        $box.attr("light-on", "true");
+                    }
+                    else {
+                        $box.attr("class", "border bg-dark");
+                        $box.attr("light-on", "false");
+                    }
+                    //event listener for boxes
+                    $box.on("click", boxOnClick);
+                }
+            }
+        }
+        function boxOnClick(event) {
+            let $box = $(event.target);
+            let rowPos = parseInt($box.attr("id").match(/[0-9]+/g)[0]);
+            let columnPos = parseInt($box.attr("id").match(/[0-9]+/g)[1]);
+            console.log(rowPos);
+            if($box.attr("light-on") == "true") {
+                $box.attr("class", "border bg-dark");
+                $box.attr("light-on", "false");   
+            }   
+            else {
+                $box.attr("class", "border");
+                $box.attr("light-on", "true");
+            }
+            //check if left, right, up, down boxes exist
+            console.log("#row-" + (rowPos - 1) + "-column-" + columnPos);
+            if($("#row-" + (rowPos - 1) + "-column-" + columnPos).length) {
+                let $adjBox = $("#row-" + (rowPos - 1) + "-column-" + columnPos);
+                if($adjBox.attr("light-on") == "true") {
+                    $adjBox.attr("class", "border bg-dark");
+                    $adjBox.attr("light-on", "false");
+                }
+                else {
+                    $adjBox.attr("class", "border");
+                    $adjBox.attr("light-on", "true");
+                }
+            }
+            console.log("#row-" + (rowPos + 1) + "-column-" + columnPos);
+            if($("#row-" + (rowPos + 1) + "-column-" + columnPos).length) {
+                let $adjBox = $("#row-" + (rowPos + 1) + "-column-" + columnPos);
+                if($adjBox.attr("light-on") == "true") {
+                    $adjBox.attr("class", "border bg-dark");
+                    $adjBox.attr("light-on", "false");
+                }
+                else {
+                    $adjBox.attr("class", "border");
+                    $adjBox.attr("light-on", "true");
+                }
+            }
+            console.log("#row-" + rowPos + "-column-" + (columnPos - 1));
+            if($("#row-" + rowPos + "-column-" + (columnPos - 1)).length) {
+                let $adjBox = $("#row-" + rowPos + "-column-" + (columnPos - 1));
+                if($adjBox.attr("light-on") == "true") {
+                    $adjBox.attr("class", "border bg-dark");
+                    $adjBox.attr("light-on", "false");
+                }
+                else {
+                    $adjBox.attr("class", "border");
+                    $adjBox.attr("light-on", "true");
+                }
+            }
+            console.log("#row-" + rowPos + "-column-" + (columnPos + 1));
+            if($("#row-" + rowPos + "-column-" + (columnPos + 1)).length) {
+                let $adjBox = $("#row-" + rowPos + "-column-" + (columnPos + 1));
+                if($adjBox.attr("light-on") == "true") {
+                    $adjBox.attr("class", "border bg-dark");
+                    $adjBox.attr("light-on", "false");
+                }
+                else {
+                    $adjBox.attr("class", "border");
+                    $adjBox.attr("light-on", "true");
+                }
+            }   
+            checkGameStatus();
+        };  
+        function checkGameStatus() {
+            let winStatus = true;
+            for(row = 0; row < numRows; row++) {
+                for(column = 0; column < numColumns; column++) {
+                    let $box = $("#row-" + row + "-column-" + column);
+                    if($box.attr("light-on") == "true") {
+                        winStatus = false;
+                    }
+                }
+            }
+            if(winStatus) {
+                let $message = $("<div class=\"alert alert-success\"> You Win </div>");
+                $("#win-message").append($message);
+                for(row = 0; row < numRows; row++) {
+                for(column = 0; column < numColumns; column++) {
+                    let $box = $("#row-" + row + "-column-" + column);
+                    $box.off();
+                }
+            }
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="d-flex justify-content-center">
+        <form name="start-game" id="start-game">
+            <label for="rows">Number of Rows:</label>
+            <input type="number" id="rows" name="rows" required>
+            <label for="columns">Number of Columnes:</label>
+            <input type="number" id="columns" name="columns" required>
+            <button type="submit">Start Game</button>
+        </form>
+    </div>
+    <div class="d-flex justify-content-center flex-column">
+        <div class="d-flex justify-content-center">
+            <div id="game-div" name="game-div" class="d-flex justify-content-center flex-column"></div>
+        </div>
+        <div id="win-message" class="d-inline-flex justify-content-center"></div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            $("#start-game").on("submit", startGame);
+            console.log("added eventhandler");
+        });
+    </script>
+</body>
+</html>
