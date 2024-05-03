@@ -1,0 +1,31 @@
+<div [ngClass]="'row'">
+    <div class="col-sm-8">
+        <p>{{word}}</p>
+        <div *ngIf="guessCorrect">
+            <p *ngIf="numGuesses > 1" [ngStyle]="{'font-weight': 'bold'}">Congratulations! You correctly guessed {{word}} in {{numGuesses}} guesses</p>
+            <p *ngIf="numGuesses == 1" [ngStyle]="{'font-weight': 'bold'}">Congratulations! You correctly guessed {{word}} in {{numGuesses}} guess</p>
+        </div>
+    
+        <div *ngIf="guessesLog.length != 0">
+            <p>Number of Guesses: {{numGuesses}}</p>
+            <p>Guesses Log:</p>
+            <ul>
+                <li *ngFor="let guessPrev of guessesLog" class="list-group-item">
+                    {{guessPrev}}
+                </li>
+            </ul>
+        </div>
+    
+        <form #gameForm="ngForm">
+            <div class="mb-3">
+                <label for="guess" class="form-label">Enter A Word:</label>
+                <input [(ngModel)]="guessModel.guess" required #guessText="ngModel" [class.is-invalid]="guessText.invalid && guessText.touched" type="text" class="form-control" id="guess" name="guess">
+                <small class="text-danger" [class.d-none]="guessText.valid || guessText.untouched">A word is required</small>    
+            </div>
+            <div class="mb-3" [ngSwitch]="guessCorrect">
+                <button *ngSwitchCase="false" (click)="submitGuess()" class="btn btn-success" [disabled]="gameForm.form.invalid">Submit Guess</button>
+                <button *ngSwitchCase="true" (click)="restart()" class="btn btn-success">Play Again</button>
+            </div>
+        </form>
+    </div>
+</div>
