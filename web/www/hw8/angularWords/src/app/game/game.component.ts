@@ -59,7 +59,7 @@ export class GameComponent {
             else {
                 message += "Guess was Correct length!";
             }
-            message += " " + numCorrectCharacters + " characters in the guess we in the target word and " + numCorrectPosition + " characters were in the correct position!";
+            message += " " + numCorrectCharacters + " characters in the guess were in the target word and " + numCorrectPosition + " characters were in the correct position!";
             this.guessesLog.push(message);
         }
 

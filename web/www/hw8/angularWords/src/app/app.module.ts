@@ -1,4 +1,4 @@
-//https://cs4640.cs.virginia.edu/vpv4ds/hw8/index.html
+// https://cs4640.cs.virginia.edu/vpv4ds/hw8/angular-words/browser/
 
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
