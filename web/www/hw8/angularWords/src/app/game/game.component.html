@@ -1,6 +1,5 @@
 <div [ngClass]="'row'">
     <div class="col-sm-8">
-        <p>{{word}}</p>
         <div *ngIf="guessCorrect">
             <p *ngIf="numGuesses > 1" [ngStyle]="{'font-weight': 'bold'}">Congratulations! You correctly guessed {{word}} in {{numGuesses}} guesses</p>
             <p *ngIf="numGuesses == 1" [ngStyle]="{'font-weight': 'bold'}">Congratulations! You correctly guessed {{word}} in {{numGuesses}} guess</p>
